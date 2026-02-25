@@ -1,41 +1,66 @@
-# Сборка Cinema 4D DollyZoom Plugin
+# Building Cinema 4D DollyZoom Plugin
 
-Исходный код плагина был написан под очень старую версию Cinema 4D SDK (до R20), поэтому при попытке компиляции в современном окружении (2025+) возникало множество ошибок. 
+The original plugin code was updated to be compatible with modern Cinema 4D versions (2025, 2026, and newer).
 
-## Что было исправлено в коде
-1. **ToolData API:** Базовый класс инструмента `CPluginToolObject` и `CToolData` заменен на современный `cinema::ToolData`.
-2. **Обработка мыши:** Устаревшие методы `MouseDown`, `MouseMove`, `MouseUp` заменены на современный цикл перетаскивания `win->MouseDragStart()`, `win->MouseDrag()` и `win->MouseDragEnd()`.
-3. **Объекты и параметры:** Использование `BaseCameraObject` заменено на `cinema::CameraObject`. 
-4. **Константы:** Старые макросы `QSHIFT_SHIFT` и `QSHIFT_CTRL` заменены на современные `QSHIFT` и `QCTRL` (из флага `BFM_INPUT_QUALIFIER`).
-5. **Чтение/запись свойств (Parameters):** Старый способ чтения свойств через `DescLevel` заменен на использование современной обертки `ConstDescIDLevel(CAMERAOBJECT_FOV)`. Также устранен конфликт пространств имен (использовано `maxon::PI` вместо просто `PI`).
-6. **Entry Points (Точки входа):** Добавлены обязательные стандартные функции инициализации плагина `PluginStart`, `PluginEnd` и `PluginMessage` внутри пространства имен `namespace cinema`, чтобы линкер смог собрать итоговую библиотеку (DLL).
+## Code Fixes and Updates
+The following changes were made to the source code for modern compatibility:
+1. **ToolData API**: Replaced legacy tool classes with the modern `cinema::ToolData`.
+2. **Mouse Interaction**: Updated to the modern `MouseDragStart`, `MouseDrag`, and `MouseDragEnd` workflow.
+3. **Camera Objects**: Updated to use `cinema::CameraObject`.
+4. **Qualifiers**: Replaced old macros with modern `QSHIFT`, `QCTRL`, etc.
+5. **Parameters**: Updated parameter access using `ConstDescIDLevel`. Resolved namespace conflicts (e.g., using `maxon::PI`).
+6. **Entry Points**: Added standard initialization functions (`PluginStart`, `PluginEnd`, `PluginMessage`) inside the `cinema` namespace.
 
-## Как работает механизм сборки
-Для поддержки разных версий Cinema 4D проект разделен на две папки SDK:
-*   `sdk_2025` — для Cinema 4D 2025
-*   `sdk_2026` — для Cinema 4D 2026
+## Build Infrastructure
+To support different Cinema 4D versions, the project uses a multi-SDK directory structure:
+*   `sdk_2025`: Targeted for Cinema 4D 2025.
+*   `sdk_2026`: Targeted for Cinema 4D 2026.
 
-Каждая папка содержит свой файл `custom_paths.txt` со строкой `MODULE ..`, что позволяет системе сборки Maxon находить исходный код плагина в родительской директории.
+Each SDK folder contains its own `custom_paths.txt` file which points to the source code in the parent directory.
 
-## Как пересобрать плагин
+## Setup Instructions
 
-**Условие:** Установлены Visual Studio 2022 (C++ Desktop development) и Python 3.
+### 1. Requirements
+*   **Visual Studio 2022** with "Desktop development with C++" workload.
+*   **Python 3** (required by Maxon Source Processor).
 
-Для сборки используйте соответствующие пакетные файлы в корне проекта:
+### 2. SDK Setup (Crucial)
+Due to licensing and file size, the full Cinema 4D SDK frameworks are not included in this repository. You must provide them manually:
 
-1.  **Для Cinema 4D 2025 (R25):** запустите [build_2025.bat](file:///c:/Users/user/Desktop/cpp/C4D_DollyZoom/build_2025.bat)
-2.  **Для Cinema 4D 2026:** запустите [build_2026.bat](file:///c:/Users/user/Desktop/cpp/C4D_DollyZoom/build_2026.bat)
+1.  **For 2025**: Copy the `frameworks` and `project` folders from the official Cinema 4D 2025 SDK into the `sdk_2025/` directory.
+2.  **For 2026**: Copy the `frameworks` and `project` folders from the official Cinema 4D 2026 SDK into the `sdk_2026/` directory.
 
-**Что делают скрипты:**
-*   Очищают или создают папку `build` внутри соответствующего SDK.
-*   Конфигурируют проект через CMake (используя Visual Studio 17 2022).
-*   Компилируют плагин в режиме **Release**.
-*   **Очистка:** Удаляют временные `C4D_DollyZoom.pdb` файлы, оставляя только готовый к работе плагин.
+The final structure should look like this:
+```
+C4D_DollyZoom/
+├── sdk_2025/
+│   ├── frameworks/   <-- Copy from 2025 SDK
+│   ├── project/      <-- Copy from 2025 SDK
+│   ├── CMakeLists.txt
+│   └── custom_paths.txt
+└── sdk_2026/
+    ├── frameworks/   <-- Copy from 2026 SDK
+    ├── project/      <-- Copy from 2026 SDK
+    ├── CMakeLists.txt
+    └── custom_paths.txt
+```
 
-## Где найти скомпилированный плагин
+## How to Build
 
-Готовый плагин `C4D_DollyZoom.xdl64` (вместе с папкой ресурсов `res`) будет находиться в:
-*   **R25:** `.../sdk_2025/build/bin/Release/plugins/C4D_DollyZoom/`
-*   **2026:** `.../sdk_2026/build/bin/Release/plugins/C4D_DollyZoom/`
+Use the provided batch files in the project root:
 
-Для установки скопируйте файл `.xdl64` и папку `res` в папку `plugins` вашей версии Cinema 4D.
+*   **For Cinema 4D 2025**: Run [build_2025.bat](file:///c:/Users/user/Desktop/cpp/C4D_DollyZoom/build_2025.bat)
+*   **For Cinema 4D 2026**: Run [build_2026.bat](file:///c:/Users/user/Desktop/cpp/C4D_DollyZoom/build_2026.bat)
+
+The scripts will:
+1.  Configure the C++ project using CMake.
+2.  Compile the plugin in **Release** mode.
+3.  Clean up temporary `.pdb` files.
+
+## Output Locations
+
+The compiled plugin `C4D_DollyZoom.xdl64` and its resources (`res`) will be located in:
+*   **2025**: `sdk_2025/build/bin/Release/plugins/C4D_DollyZoom/`
+*   **2026**: `sdk_2026/build/bin/Release/plugins/C4D_DollyZoom/`
+
+To install the plugin, copy the `C4D_DollyZoom.xdl64` file and the `res` folder into your Cinema 4D `plugins` directory.

@@ -65,3 +65,6 @@ task.md
 implementation_plan.md
 walkthrough.md
 *.log
+
+# Release Artifacts
+*.zip
