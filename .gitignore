@@ -1,0 +1,67 @@
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.db
+*.opendb
+
+# CMake
+build/
+CMakeFiles/
+CMakeCache.txt
+*.cmake
+install/
+
+# SDK Folders: Ignore everything EXCEPT our configuration files
+sdk_2025/*
+!sdk_2025/CMakeLists.txt
+!sdk_2025/custom_paths.txt
+!sdk_2025/CMakePresets.json
+!sdk_2025/cmake/
+!sdk_2025/project/
+!sdk_2025/frameworks/
+
+# Dig deeper to ignore framework sources but keep their structure if needed
+# (Or just ignore all frameworks and assume user provides them)
+sdk_2025/frameworks/*
+sdk_2025/project/*
+
+sdk_2026/*
+!sdk_2026/CMakeLists.txt
+!sdk_2026/custom_paths.txt
+!sdk_2026/CMakePresets.json
+!sdk_2026/cmake/
+!sdk_2026/project/
+!sdk_2026/frameworks/
+
+sdk_2026/frameworks/*
+sdk_2026/project/*
+
+# Cinema 4D / Maxon
+*.pdb
+*.exp
+*.lib
+_frameworks/
+_generated/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Agent Artifacts
+.gemini/
+.serena/
+brain/
+task.md
+implementation_plan.md
+walkthrough.md
+*.log

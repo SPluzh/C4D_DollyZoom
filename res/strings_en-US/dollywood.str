@@ -1,0 +1,11 @@
+STRINGTABLE {
+  LANGID=1033 // English
+  {
+    MENU {
+      DOLLYWOOD "Dolly Zoom Tool";
+    }
+    TOOLTIPS {
+      DOLLYWOOD "Vertical Tilt & Go Dolly Zoom Tool\nDrag left/right to dolly zoom";
+    }
+  }
+}
