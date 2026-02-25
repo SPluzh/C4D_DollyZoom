@@ -22,14 +22,14 @@ Bool DollyWoodToolData::GetCursorInfo(BaseDocument* doc, BaseContainer& data, Ba
 
 Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseDraw* bd, EditorWindow* win, const BaseContainer& msg)
 {
-    // ── ВХОДНЫЕ ДАННЫЕ ──
+    // INPUT DATA
     Float mx = msg.GetFloat(BFM_INPUT_X);
     Float my = msg.GetFloat(BFM_INPUT_Y);
 
     if (msg.GetInt32(BFM_INPUT_CHANNEL) != BFM_INPUT_MOUSELEFT)
         return true;
 
-    // ── КАМЕРА ──
+    // CAMERA
     CameraObject* activeCamera = (CameraObject*)bd->GetSceneCamera(doc);
     if (!activeCamera)
         activeCamera = (CameraObject*)doc->GetRenderBaseDraw()->GetSceneCamera(doc);
@@ -37,21 +37,21 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     if (!activeCamera || !activeCamera->IsInstanceOf(Ocamera))
         return false;
 
-    // ── 🎯 TARGET ОПРЕДЕЛЕНИЕ (ПРИОРИТЕТ: DOLLYTARGET В СЦЕНЕ) ──
+    // TARGET DEFINITION (PRIORITY: DOLLYTARGET IN SCENE)
     BaseObject* targetObject = doc->SearchObject("DollyTarget"_s);
     
-    // Fallback на активный объект только если DollyTarget не найден
+    // Fallback to active object only if DollyTarget is not found
     if (!targetObject || !targetObject->IsInstanceOf(Onull))
     {
         targetObject = doc->GetActiveObject();
     }
 
-    // ── ✅ КОНСТАНТЫ (ФИКСИРУЕМ ДО ДРАГА!) ──
+    // CONSTANTS (FIX BEFORE DRAG!)
     GeData fovData;
     activeCamera->GetParameter(ConstDescIDLevel(CAMERAOBJECT_FOV), fovData, DESCFLAGS_GET::NONE);
     Float originalFOV = fovData.GetFloat();
 
-    // ── 📐 SENSOR WIDTH (для расчёта focal length) ──
+    // SENSOR WIDTH (for focal length calculation)
     GeData apertureData;
     activeCamera->GetParameter(ConstDescIDLevel(CAMERAOBJECT_APERTURE), apertureData, DESCFLAGS_GET::NONE);
     Float sensorWidth = apertureData.GetFloat();
@@ -64,7 +64,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     Float originalDistance;
     Vector fixedSubjectPos;
 
-    // ── 🎯 РАСчёт ЦЕЛЕВОЙ ТОЧКИ ──
+    // TARGET POINT CALCULATION
     if (targetObject)
     {
         Vector targetPos = targetObject->GetMg().off;
@@ -76,7 +76,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     }
     else
     {
-        // Без цели - используем TargetDistance камеры
+        // No target - use camera TargetDistance
         GeData distData;
         activeCamera->GetParameter(ConstDescIDLevel(CAMERAOBJECT_TARGETDISTANCE),
                                    distData, DESCFLAGS_GET::NONE);
@@ -91,7 +91,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     Float tanHalfOrigFOV = cinema::Tan(originalFOV * 0.5);
     Float origMx = mx;
 
-    // ── 📊 НАЧАЛЬНЫЕ ЗНАЧЕНИЯ В СТАТУС-БАР ──
+    // INITIAL VALUES IN STATUS BAR
     Float startFOVDeg = ::maxon::RadToDeg((::maxon::Float64)originalFOV);
     Float startFocalLength = (sensorWidth * 0.5) / cinema::Tan(originalFOV * 0.5);
     
@@ -103,13 +103,13 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
         ::maxon::String::FloatToString(originalDistance, -1, 1))
     );
 
-    // ── UNDO ──
+    // UNDO
     doc->StartUndo();
     doc->AddUndo(UNDOTYPE::CHANGE, activeCamera);
     if (targetObject)
         doc->AddUndo(UNDOTYPE::CHANGE, targetObject);
 
-    // ── 🖱️ MOUSE DRAG ──
+    // MOUSE DRAG
     BaseContainer device;
     win->MouseDragStart(KEY_MLEFT, mx, my,
                        MOUSEDRAGFLAGS::DONTHIDEMOUSE | MOUSEDRAGFLAGS::NOMOVE);
@@ -122,7 +122,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
         mx += dx;
         Float deltaX = mx - origMx;
 
-        // ── СКОРОСТЬ (Shift/Control) ──
+        // SPEED (Shift/Control)
         Float amount = 1.0;
         Int32 qualifier = device.GetInt32(BFM_INPUT_QUALIFIER);
 
@@ -135,7 +135,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
 
         if (amount <= 0.01) amount = 0.01;
 
-        // ── 🧮 DOLLY ZOOM ──
+        // DOLLY ZOOM
         Float newFOV = originalFOV / amount;
         if (newFOV > 0.001 && newFOV < maxon::PI * 0.99)
         {
@@ -145,7 +145,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
 
             Vector newCamPos = fixedSubjectPos - originalViewDir * newDistance;
 
-            // ПРИМЕНЯЕМ ИЗМЕНЕНИЯ
+            // APPLY CHANGES
             activeCamera->SetParameter(ConstDescIDLevel(CAMERAOBJECT_FOV),
                                        GeData(newFOV), DESCFLAGS_SET::NONE);
             
@@ -159,7 +159,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
             newMatrix.off = newCamPos;
             activeCamera->SetMg(newMatrix);
 
-            // ── 📊 ВЫВОД FOV + FOCAL LENGTH В СТАТУС-БАР ──
+            // OUTPUT FOV + FOCAL LENGTH TO STATUS BAR
             Float fovDegrees  = ::maxon::RadToDeg((::maxon::Float64)newFOV);
             Float focalLength = (sensorWidth * 0.5) / tanHalfNewFOV;
 
@@ -172,7 +172,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
         DrawViews(DRAWFLAGS::ONLY_ACTIVE_VIEW | DRAWFLAGS::NO_THREAD | DRAWFLAGS::NO_ANIMATION);
     }
 
-    // ── FINISH ──
+    // FINISH
     if (win->MouseDragEnd() == MOUSEDRAGRESULT::ESCAPE)
     {
         doc->DoUndo(true);
@@ -180,7 +180,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     }
     else
     {
-        // ── 📊 ФИНАЛЬНЫЕ ЗНАЧЕНИЯ ──
+        // FINAL VALUES
         GeData finalFovData;
         activeCamera->GetParameter(ConstDescIDLevel(CAMERAOBJECT_FOV), finalFovData, DESCFLAGS_GET::NONE);
         Float finalFOV = finalFovData.GetFloat();
@@ -210,7 +210,7 @@ Bool RegisterDollyWood()
         "Dolly Zoom Tool"_s,
         0,
         AutoBitmap("dollywood.tif"_s),
-        "Dolly Zoom PERFECT\n\u2022 Автоматически использует DollyTarget\n\u2022 Выделенный объект как fallback\n\u2022 Shift/Control = скорость"_s,
+        "Dolly Zoom PERFECT\n- Automatically uses DollyTarget\n- Selected object as fallback\n- Shift/Control = speed"_s,
         NewObjClear(DollyWoodToolData)
     );
 }
