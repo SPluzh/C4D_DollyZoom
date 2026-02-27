@@ -68,6 +68,108 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     if (targetObject)
     {
         Vector targetPos = targetObject->GetMg().off;
+        
+        // COMPONENT SELECTION SUPPORT
+        if (targetObject->IsInstanceOf(Opoint))
+        {
+            PointObject* po = (PointObject*)targetObject;
+            const Vector* points = po->GetPointR();
+            Int32 pointCount = po->GetPointCount();
+            
+            Vector sumPos(0);
+            Int32 selectedCount = 0;
+
+            // 1. Check Points
+            const BaseSelect* ptSel = po->GetPointS();
+            if (ptSel && ptSel->GetCount() > 0)
+            {
+                for (Int32 i = 0; i < pointCount; ++i)
+                {
+                    if (ptSel->IsSelected(i))
+                    {
+                        sumPos += points[i];
+                        selectedCount++;
+                    }
+                }
+            }
+            // 2. Check Edges (if no points selected)
+            else if (targetObject->IsInstanceOf(Opolygon))
+            {
+                PolygonObject* polyObj = (PolygonObject*)targetObject;
+                const BaseSelect* edgeSel = polyObj->GetEdgeS();
+                if (edgeSel && edgeSel->GetCount() > 0)
+                {
+                    // Use a simple bitset or boolean array to avoid double-counting points
+                    // For brevity in this tool, we'll use a local array. 
+                    // In a production environment, maxon::BaseArray<Bool> or similar would be better.
+                    maxon::BaseArray<Bool> usedPoints;
+                    usedPoints.Resize(pointCount) iferr_ignore("Point map resize");
+                    for (Int32 i = 0; i < pointCount; i++) usedPoints[i] = false;
+
+                    const CPolygon* polys = polyObj->GetPolygonR();
+                    Int32 polyCount = polyObj->GetPolygonCount();
+
+                    for (Int32 i = 0; i < polyCount; ++i)
+                    {
+                        const CPolygon& p = polys[i];
+                        for (Int32 side = 0; side < 4; ++side)
+                        {
+                            if (side == 3 && p.c == p.d) continue; // Triangle
+                            
+                            Int32 edgeIdx = i * 4 + side;
+                            if (edgeSel->IsSelected(edgeIdx))
+                            {
+                                Int32 a = (side == 0) ? p.a : (side == 1) ? p.b : (side == 2) ? p.c : p.d;
+                                Int32 b = (side == 0) ? p.b : (side == 1) ? p.c : (side == 2) ? p.d : p.a;
+                                
+                                if (!usedPoints[a]) { sumPos += points[a]; selectedCount++; usedPoints[a] = true; }
+                                if (!usedPoints[b]) { sumPos += points[b]; selectedCount++; usedPoints[b] = true; }
+                            }
+                        }
+                    }
+                }
+                // 3. Check Polygons (if no points or edges selected)
+                if (selectedCount == 0)
+                {
+                    const BaseSelect* polySel = polyObj->GetPolygonS();
+                    if (polySel && polySel->GetCount() > 0)
+                    {
+                        maxon::BaseArray<Bool> usedPoints;
+                        usedPoints.Resize(pointCount) iferr_ignore("Point map resize");
+                        for (Int32 i = 0; i < pointCount; i++) usedPoints[i] = false;
+
+                        const CPolygon* polys = polyObj->GetPolygonR();
+                        Int32 polyCount = polyObj->GetPolygonCount();
+
+                        for (Int32 i = 0; i < polyCount; ++i)
+                        {
+                            if (polySel->IsSelected(i))
+                            {
+                                const CPolygon& p = polys[i];
+                                Int32 indices[4] = { p.a, p.b, p.c, p.d };
+                                Int32 sides = (p.c == p.d) ? 3 : 4;
+                                for (Int32 s = 0; s < sides; ++s)
+                                {
+                                    Int32 idx = indices[s];
+                                    if (!usedPoints[idx])
+                                    {
+                                        sumPos += points[idx];
+                                        selectedCount++;
+                                        usedPoints[idx] = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (selectedCount > 0)
+            {
+                targetPos = targetObject->GetMg() * (sumPos / (Float)selectedCount);
+            }
+        }
+
         Vector toTarget = targetPos - originalMatrix.off;
         originalDistance = toTarget.x * originalViewDir.x + toTarget.y * originalViewDir.y + toTarget.z * originalViewDir.z;
 
