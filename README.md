@@ -9,6 +9,8 @@ https://github.com/user-attachments/assets/178d0cdf-09ab-4c23-8c07-784dcd73fa96
 ## Features
 *   Smooth real-time Dolly Zoom interaction.
 *   Automatic target detection.
+*   Focal length snapping (Ctrl key).
+*   Precision speed control (Shift key).
 *   Support for Cinema 4D 2025 and 2026.
 *   Clean performance-optimized C++ implementation.
 
@@ -19,6 +21,12 @@ The plugin intelligently determines the focal point of the effect based on the f
 1.  **DollyTarget Object**: If you create a Null object and name it exactly `DollyTarget`, the plugin will always use its position as the center of the effect, regardless of your selection.
 2.  **Selected Object**: If no `DollyTarget` exists, the plugin will use the position of any object you currently have selected in the Object Manager.
 3.  **DOF Auto Mode**: If there are no objects selected and no `DollyTarget` is found, the plugin falls back to an automatic mode using the camera's current **Focus Distance**. This ensures the effect always has a valid pivot point.
+
+## Modifier Keys (During Drag)
+
+*   **No key**: Standard speed.
+*   **Shift**: Precision mode (much slower movement) for fine-tuning.
+*   **Control (Ctrl)**: Snapping mode. The focal length snaps to the nearest **integer millimeter** (e.g., 24mm, 35mm, 50mm). The dragging speed remains the same as standard mode.
 
 ## Download
 

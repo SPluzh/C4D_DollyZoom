@@ -230,15 +230,23 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
 
         if (qualifier & QSHIFT)
             amount = 1.0 + deltaX / 5000.0;
-        else if (qualifier & QCTRL)
-            amount = 1.0 + deltaX / 500.0;
         else
-            amount = 1.0 + deltaX / 125.0;
+            amount = 1.0 + deltaX / 125.0; // Default speed for no key OR result of snapping logic
 
         if (amount <= 0.01) amount = 0.01;
 
         // DOLLY ZOOM
         Float newFOV = originalFOV / amount;
+
+        // Snapping: if Ctrl is pressed, lock to integer focal length
+        if (qualifier & QCTRL)
+        {
+            Float focalMm = (sensorWidth * 0.5) / cinema::Tan(newFOV * 0.5);
+            Float snapped = cinema::Floor(focalMm + 0.5);
+            if (snapped < 1.0) snapped = 1.0;
+            newFOV = 2.0 * cinema::ATan(sensorWidth * 0.5 / snapped);
+        }
+
         if (newFOV > 0.001 && newFOV < maxon::PI * 0.99)
         {
             Float tanHalfNewFOV = cinema::Tan(newFOV * 0.5);
