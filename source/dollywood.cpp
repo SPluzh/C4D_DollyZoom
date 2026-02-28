@@ -319,7 +319,7 @@ Bool RegisterDollyWood()
         PLUGIN_ID_DOLLYWOOD,
         "Dolly Zoom Tool"_s,
         0,
-        AutoBitmap("dollywood.tif"_s),
+        AutoBitmap("dollywood.png"_s),
         "Dolly Zoom PERFECT\n- Automatically uses DollyTarget\n- Selected object as fallback\n- Shift/Control = speed"_s,
         NewObjClear(DollyWoodToolData)
     );
