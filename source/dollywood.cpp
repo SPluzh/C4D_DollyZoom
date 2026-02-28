@@ -178,12 +178,15 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     }
     else
     {
-        // No target - use camera TargetDistance
-        GeData distData;
-        activeCamera->GetParameter(ConstDescIDLevel(CAMERAOBJECT_TARGETDISTANCE),
-                                   distData, DESCFLAGS_GET::NONE);
-        originalDistance = distData.GetFloat();
-        if (originalDistance <= 10.0) originalDistance = 200.0;
+        // DOF Auto Mode: target = world origin (0, 0, 0)
+        Vector sceneCenter(0.0, 0.0, 0.0);
+
+        Vector toCenter = sceneCenter - originalMatrix.off;
+        originalDistance = toCenter.x * originalViewDir.x
+                         + toCenter.y * originalViewDir.y
+                         + toCenter.z * originalViewDir.z;
+
+        if (originalDistance < 10.0) originalDistance = 200.0;
 
         fixedSubjectPos = originalMatrix.off + originalViewDir * originalDistance;
     }
@@ -197,7 +200,7 @@ Bool DollyWoodToolData::MouseInput(BaseDocument* doc, BaseContainer& data, BaseD
     Float startFOVDeg = ::maxon::RadToDeg((::maxon::Float64)originalFOV);
     Float startFocalLength = (sensorWidth * 0.5) / cinema::Tan(originalFOV * 0.5);
     
-    ::maxon::String targetInfo = targetObject ? "Target: DollyTarget"_s : "Target: Camera"_s;
+    ::maxon::String targetInfo = targetObject ? "Target: DollyTarget"_s : "Target: World Origin"_s;
     StatusSetText(FormatString("Dolly Zoom | @ | FOV: @° | Focal: @ mm | Dist: @ cm",
         targetInfo,
         ::maxon::String::FloatToString(startFOVDeg, -1, 1),

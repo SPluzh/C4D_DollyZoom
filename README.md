@@ -22,7 +22,7 @@ The plugin intelligently determines the focal point of the effect based on the f
 1.  **DollyTarget Object**: If you create a Null object and name it exactly `DollyTarget`, the plugin will always use its position.
 2.  **Selected Component**: If no `DollyTarget` exists, the plugin uses the center of your selected **points, edges, or polygons**.
 3.  **Selected Object**: If no component is selected, it uses the position of the currently selected object.
-4.  **DOF Auto Mode**: If nothing is selected and no `DollyTarget` is found, it falls back to the camera's **Focus Distance**.
+4.  **DOF Auto Mode**: If nothing is selected and no `DollyTarget` is found, it falls back to the **World Origin (0,0,0)**.
 
 ## Modifier Keys (During Drag)
 

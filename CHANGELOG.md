@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-02-28
+### Changed
+- DOF Auto Mode now targets the **World Origin (0,0,0)** when no target object or component is selected.
+
 ## [1.0.2] - 2026-02-28
 ### Added
 - Integer focal length adjustment when holding the **Control (Ctrl)** key.
