@@ -7,20 +7,22 @@ https://github.com/user-attachments/assets/178d0cdf-09ab-4c23-8c07-784dcd73fa96
 
 
 ## Features
-*   Smooth real-time Dolly Zoom interaction.
-*   Automatic target detection.
+*   Flexible target selection:
+    *   **DollyTarget** null object (highest priority).
+    *   Selected **geometric components** (Points, Edges, Polygons).
+    *   Selected **Object** (fallback).
 *   Focal length snapping (Ctrl key).
 *   Precision speed control (Shift key).
 *   Support for Cinema 4D 2025 and 2026.
-*   Clean performance-optimized C++ implementation.
 
 ## How to Use (Target Selection Logic)
 
 The plugin intelligently determines the focal point of the effect based on the following priority:
 
-1.  **DollyTarget Object**: If you create a Null object and name it exactly `DollyTarget`, the plugin will always use its position as the center of the effect, regardless of your selection.
-2.  **Selected Object**: If no `DollyTarget` exists, the plugin will use the position of any object you currently have selected in the Object Manager.
-3.  **DOF Auto Mode**: If there are no objects selected and no `DollyTarget` is found, the plugin falls back to an automatic mode using the camera's current **Focus Distance**. This ensures the effect always has a valid pivot point.
+1.  **DollyTarget Object**: If you create a Null object and name it exactly `DollyTarget`, the plugin will always use its position.
+2.  **Selected Component**: If no `DollyTarget` exists, the plugin uses the center of your selected **points, edges, or polygons**.
+3.  **Selected Object**: If no component is selected, it uses the position of the currently selected object.
+4.  **DOF Auto Mode**: If nothing is selected and no `DollyTarget` is found, it falls back to the camera's **Focus Distance**.
 
 ## Modifier Keys (During Drag)
 
