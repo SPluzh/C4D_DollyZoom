@@ -35,6 +35,10 @@ The release ZIP contains pre-built binaries for different Cinema 4D versions:
 *   `2025/C4D_DollyZoom` — for Cinema 4D 2025.
 *   `2026/C4D_DollyZoom` — for Cinema 4D 2026.
 
+## Changelog
+
+See **[CHANGELOG.md](CHANGELOG.md)** for a full list of changes.
+
 ## Installation
 
 1.  Download and extract the `C4D_DollyZoom_vX.X.X.zip`.
