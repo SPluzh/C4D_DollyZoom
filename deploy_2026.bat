@@ -9,18 +9,17 @@ echo [DEST]   %DEST%
 echo.
 
 :: Using PowerShell Copy-Item which is less sensitive to HGFS metadata issues than xcopy/robocopy
-powershell -Command "if (Test-Path '%DEST%') { Remove-Item -Path '%DEST%' -Recurse -Force }; Copy-Item -Path '%SOURCE%' -Destination '%DEST%' -Recurse -Force"
+:: $ErrorActionPreference = 'Stop' ensures that both Remove-Item and Copy-Item failures are caught
+powershell -Command "$ErrorActionPreference = 'Stop'; try { if (Test-Path '%DEST%') { Remove-Item -Path '%DEST%' -Recurse -Force }; Copy-Item -Path '%SOURCE%' -Destination '%DEST%' -Recurse -Force } catch { exit 1 }"
 
 if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Copy failed! Exit Code: %ERRORLEVEL%
+    echo [ERROR] Cinema 4D is likely running on the remote machine and locking files.
+    echo [ERROR] Please close Cinema 4D and try again.
     echo.
-    echo [ERROR] Copy failed with exit code %ERRORLEVEL%.
-    echo Please ensure Cinema 4D is closed and the network share is accessible.
-    echo.
-    pause
+    ::pause
     exit /b %ERRORLEVEL%
 )
 
-echo.
 echo [SUCCESS] Plugin files successfully copied/updated!
 echo.
-pause
