@@ -1,6 +1,6 @@
 # C4D Dolly Zoom Plugin
 
-A professional tool for Cinema 4D that implements the classic "Dolly Zoom" (Vertigo) effect. It dynamically adjusts the camera's Field of View (FOV) as you move the camera, keeping the subject at a constant size while the background perspective warps.
+A tool for Cinema 4D that implements the classic "Dolly Zoom" (Vertigo) effect. It dynamically adjusts the camera's Field of View (FOV) as you move the camera, keeping the subject at a constant size while the background perspective warps.
 
 
 https://github.com/user-attachments/assets/178d0cdf-09ab-4c23-8c07-784dcd73fa96
