@@ -5,7 +5,7 @@
 #include "c4d_tooldata.h"
 
 
-#define PLUGIN_ID_DOLLYWOOD 1053605
+#define PLUGIN_ID_DOLLYWOOD 1067825
 
 class DollyWoodToolData : public cinema::ToolData
 {
