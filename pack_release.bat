@@ -26,8 +26,8 @@ mkdir "%STAGING%\2025\C4D_DollyZoom"
 mkdir "%STAGING%\2026\C4D_DollyZoom"
 
 :: Paths to built plugins
-set "SRC_2025=sdk_2025\build\bin\Release\plugins\C4D_DollyZoom"
-set "SRC_2026=sdk_2026\build\bin\Release\plugins\C4D_DollyZoom"
+set "SRC_2025=C:\Users\user\Desktop\cpp\C4D_SDK\sdk_2025\build\bin\Release\plugins\C4D_DollyZoom"
+set "SRC_2026=C:\Users\user\Desktop\cpp\C4D_SDK\sdk_2026\build\bin\Release\plugins\C4D_DollyZoom"
 
 :: Copy 2025
 if exist "%SRC_2025%" (
