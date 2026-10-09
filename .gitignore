@@ -18,3 +18,7 @@ install/
 # Release Artifacts
 *.zip
 dist_staging/
+
+# Agent Artifacts
+.gemini/
+.serena/
